@@ -2,7 +2,9 @@ from base import agent, entorn, joc
 
 class AspiradorNoG(joc.JocNoGrafic):
 
-    def __init__(self, agents: list[agent.Agent]):
+    def __init__(self, agents: list[agent.Agent] | None = None):
+        if agents is None:
+            agents = []
         super(AspiradorNoG, self).__init__(agents=agents)
         # TODO
 
