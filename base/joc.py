@@ -32,7 +32,10 @@ class HasPerdut(Exception):
 
 class Joc:
     def __init__(
-            self, mida_pantalla: tuple[int, int], agents: list[agent.Agent], title: str
+            self,
+            agents: list[agent.Agent],
+            mida_pantalla: tuple[int, int] | None = None,
+            title: str | None = None
     ):
         self._mida_pantalla = mida_pantalla
         self._agents = agents
@@ -81,7 +84,7 @@ class JocNoGrafic(Joc, ABC):
             agents = [agents]
         self._agents = agents
 
-        super(JocNoGrafic, self).__init__(agents=agents)
+        super(JocNoGrafic, self).__init__(agents=agents, mida_pantalla=None, title=None)
 
     def comencar(self) -> None:
         while True:
