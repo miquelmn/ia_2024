@@ -56,22 +56,5 @@ class AspiradorReflex(Aspirador):
 
 class AspiradorMemoria(Aspirador):
     def actua(self, percepcio: dict) -> entorn.Accio:
-        memoria = self.get_memoria(1)
+        """ TODO """
 
-        if memoria is None:
-            memoria = [False, False]
-
-        if not percepcio["Net"]:
-            return AccionsAspirador.ASPIRA
-
-        memoria[percepcio["Loc"]] = True
-
-        self.set_memoria(memoria)
-
-        if memoria[0] and memoria[1]:
-            return AccionsAspirador.ATURA
-
-        if percepcio["Loc"] == 0:
-            return AccionsAspirador.DRETA
-        else:
-            return AccionsAspirador.ESQUERRA
