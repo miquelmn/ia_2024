@@ -12,7 +12,7 @@ llibreries instal·lades. Per fer-ho s'han de seguir les següents passes:
 
 Descarregar el repositori.
 ```
-     git clone https://github.com/miquelmn/ia_2023.git
+     git clone https://github.com/miquelmn/ia_2024.git
 ```
 
 **Segon pas**:
