@@ -13,5 +13,5 @@ class BarcaGreedy(Barca):
     def __init__(self):
         super(BarcaGreedy, self).__init__()
 
-    def actua(self, percepcio: dict) -> AccionsBarca | (AccionsBarca, (int, int)):
+    def actua(self, percepcio: dict) -> AccionsBarca | tuple[AccionsBarca, (int, int)]:
         pass

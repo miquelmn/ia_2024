@@ -1,6 +1,7 @@
 import copy
 import itertools
 
+from quiques.joc import Joc
 
 class Estat:
     MAX_ANIMALS = 3
@@ -13,15 +14,15 @@ class Estat:
         if (acc[-1] + acc[-2]) < 3 and not (acc[-1] == 0 and acc[-2] == 0)
     ]
 
-    def __init__(self, local_barca: str, llops_esq: int, polls_esq: int, accions_previes=None):
-        if accions_previes is None:
-            accions_previes = []
+    def __init__(self, local_barca: str, llops_esq: int, polls_esq: int, cami=None):
+        if cami is None:
+            cami = []
 
         self.llops_esq = llops_esq
         self.quica_esq = polls_esq
         self.local_barca = local_barca
 
-        self.accions_previes = accions_previes
+        self.cami = cami
 
     def __hash__(self):
         return hash((self.llops_esq, self.quica_esq))
@@ -80,7 +81,7 @@ class Estat:
         for moviments in self.moviments_poss:
             nou_estat = copy.deepcopy(self)
             nou_estat.pare = (self)
-            nou_estat.accions_previes.append(moviments)
+            nou_estat.cami.append(moviments)
 
             quiques, llops = moviments
 
@@ -89,7 +90,7 @@ class Estat:
                 quiques = -quiques
                 llops = -llops
 
-            nou_estat.local_barca = -self.local_barca
+            nou_estat.local_barca = Joc.altre_lloc(self.local_barca)
             nou_estat.quica_esq += quiques
             nou_estat.llops_esq += llops
 
@@ -100,4 +101,4 @@ class Estat:
 
     def __str__(self):
         return (f"Llops esq: {self.llops_esq}, Quiques esq: {self.quica_esq} | "
-                f"Llops dreta: {self.llops_dreta}, Quiques dreta: {self.quica_dreta} | Accio {self.accions_previes}")
+                f"Llops dreta: {self.llops_dreta}, Quiques dreta: {self.quica_dreta} | Accio {self.cami}")

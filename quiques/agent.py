@@ -26,7 +26,7 @@ class Barca(agent.Agent):
         print(self._posicio_pintar)
 
     @abc.abstractmethod
-    def actua(self, percepcio: dict) -> AccionsBarca | (AccionsBarca, (int, int)):
+    def actua(self, percepcio: dict) -> AccionsBarca | tuple[AccionsBarca, (int, int)]:
         pass
 
 

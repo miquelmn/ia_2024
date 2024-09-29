@@ -10,9 +10,9 @@ class AccionsBarca(entorn.Accio, enum.Enum):
     ATURAR = 1
 
 
-class Illes(joc.Joc):
+class Joc(joc.Joc):
     def __init__(self, agents: list[agent.Agent]):
-        super(Illes, self).__init__(agents, (1024, 512), title="Casa")
+        super(Joc, self).__init__(agents, (1024, 512), title="Casa")
 
         self.__illes = {
             "ESQ": {"LLOP": 3, "POLL": 3},
@@ -43,7 +43,7 @@ class Illes(joc.Joc):
             if moviment_llop + moviment_polls > 2:
                 raise agent.Trampes()
 
-            lloc_dif = Illes.altre_lloc(self.__lloc)
+            lloc_dif = Joc.altre_lloc(self.__lloc)
 
             self.__illes[self.__lloc]["LLOP"] -= moviment_llop
             self.__illes[lloc_dif]["LLOP"] += moviment_llop
@@ -58,7 +58,7 @@ class Illes(joc.Joc):
                     raise joc.HasPerdut("Els llops s'han menjat els polls")
 
     def _draw(self) -> None:
-        super(Illes, self)._draw()
+        super(Joc, self)._draw()
         window = self._game_window
         window.fill(pygame.Color(88, 189, 247))
 
