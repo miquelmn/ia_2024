@@ -2,34 +2,34 @@ from tictac import agent
 
 class Estat:
 
-    def __init__(self, taulell, agent_actual: agent, accions_previes=None):
+    def __init__(self, taulell, fitxa: str, accions_previes=None):
         if accions_previes is None:
             accions_previes = []
 
         self.taulell = taulell
         self.accions_previes = accions_previes
-        self.agent_actual = agent_actual
+        self.fitxa = fitxa
 
     def es_meta(self) -> bool:
         pos_x, pos_y = self.accions_previes[-1]
 
-        horizontal_check = self.__linear_check(pos_x, pos_y, self.agent_actual)
+        horizontal_check = self.__linear_check(pos_x, pos_y)
         vertical_check = self.__linear_check(
-            pos_y, pos_x, self.agent_actual, reverse=True
+            pos_y, pos_x, reverse=True
         )
 
         diagonal_check_tl = self.__diagonal_check(
-            pos_x, pos_y, self.agent_actual, (+1, -1)
+            pos_x, pos_y, (+1, -1)
         )
         diagonal_check_tr = self.__diagonal_check(
-            pos_x, pos_y, self.agent_actual, (+1, +1)
+            pos_x, pos_y, (+1, +1)
         )
 
         return (
                 horizontal_check or vertical_check or diagonal_check_tl or diagonal_check_tr
         )
 
-    def __diagonal_check(self, pos_1, pos_2, agent, desp: tuple):
+    def __diagonal_check(self, pos_1, pos_2, desp: tuple):
         continu = False
         count = 0
         best_lineal = 0
@@ -45,7 +45,7 @@ class Estat:
             if not (0 <= i < len(self.taulell) and 0 <= j < len(self.taulell[0])):
                 continue
 
-            if self.taulell[i][j].tipus is agent.jugador:
+            if self.taulell[i][j] is self.fitxa:
                 if not continu:
                     continu = True
                 count += 1
@@ -59,7 +59,7 @@ class Estat:
 
         return best_lineal >= 3
 
-    def __linear_check(self, pos_1, pos_2, agent, reverse=False) -> bool:
+    def __linear_check(self, pos_1, pos_2, reverse=False) -> bool:
         continu = False
         count = 0
         best_lineal = 0
@@ -69,11 +69,11 @@ class Estat:
                 1,
         ):
             if reverse:
-                tipus = self.taulell[pos_2][x].tipus
+                tipus = self.taulell[pos_2][x]
             else:
-                tipus = self.taulell[x][pos_2].tipus
+                tipus = self.taulell[x][pos_2]
 
-            if tipus is agent.jugador:
+            if tipus is self.fitxa:
                 if not continu:
                     continu = True
                 count += 1
