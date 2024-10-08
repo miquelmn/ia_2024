@@ -152,7 +152,7 @@ class AgentMoneda(agent.Agent):
             self.cerca(estat_inicial)
 
         if self.__accions:
-            acc = self.__accions.pop()
+            acc = self.__accions.pop(0)
 
             return acc[0], acc[1]
         else:
