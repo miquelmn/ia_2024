@@ -2,8 +2,11 @@ from practica import agent, joc
 
 
 def main():
-    agents = [agent.Viatger("Miquel")]
-    lab = joc.Laberint(agents)
+    mida = (12,12)
+
+    agents = [agent.Viatger("Miquel", size=mida), agent.Viatger("Tomeu", size=mida)]
+    lab = joc.Laberint(agents, mida_taulell=mida)
+
     lab.comencar()
 
 

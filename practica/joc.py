@@ -19,6 +19,9 @@ class Accions(enum.Enum):
     BOTAR = 2
     ESPERAR = 3
 
+    def __repr__(self):
+        return self.name
+
 
 class Viatger(agent_lib.Agent):
     PATH_IMG = "../assets/prova.png"
@@ -30,7 +33,7 @@ class Viatger(agent_lib.Agent):
     ):
         super().__init__(long_memoria=1)
 
-        posicio = random.randint(0, 7), random.randint(0, 7)
+        posicio = random.randint(0, size[0] - 1), random.randint(0, size[1] - 1)
 
         self.__posicio = posicio
 
@@ -123,13 +126,20 @@ class Casella:
             img = pygame.transform.scale(img, Casella.SIZE)
             window.blit(img, (x * Casella.SIZE[0], y * Casella.SIZE[1]))
 
+    def simplifica(self):
+        simple = "L"
+        if not (self.__tipus is TipusCas.PARET or self.is_desti() or self.__agent is not None):
+            simple = "O"
+
+        return simple
+
 
 class Laberint(joc.Joc):
     MOVS = {
-        "N": (0, 1),
-        "O": (1, 0),
-        "S": (0, -1),
-        "E": (-1, 0),
+        "N": (0, -1),
+        "O": (-1, 0),
+        "S": (0, 1),
+        "E": (1, 0),
     }
 
     def __init__(
@@ -137,6 +147,7 @@ class Laberint(joc.Joc):
             agents: list[Viatger],
             mida_taulell: tuple[int, int] = (12, 12),
             pos_final: tuple[int, int] = None,
+            parets: str | set = None,
     ):
         super(Laberint, self).__init__(
             agents,
@@ -186,7 +197,8 @@ class Laberint(joc.Joc):
 
         for paret in parets:
             x, y = paret // self.__mida_taulell[0], paret % self.__mida_taulell[0]
-            if (x * self.__mida_taulell[0] + y) in parets and self.__caselles[x][y]:
+            if (x * self.__mida_taulell[0] + y) in parets and not self.__caselles[x][
+                y].is_desti() and self.__caselles[x][y].is_accessible():
                 self.__caselles[x][y].put_paret()
                 self.__parets.add((x, y))
 
@@ -205,6 +217,9 @@ class Laberint(joc.Joc):
             Laberint.MOVS[direccio][1] * multiplicador + pos_original[1]
         )
 
+    def __pos_correcte(self, pos) -> bool:
+        return 0 <= pos[0] < self.__mida_taulell[0] and 0 <= pos[1] < self.__mida_taulell[1]
+
     def __moure_agent(self, direccio: str, agent_actual: Viatger, multiplicador: int = 1):
         """ Mou l'agent en la direcció indicada.
 
@@ -218,43 +233,50 @@ class Laberint(joc.Joc):
         pos_original = agent_actual.posicio
         pos_updated = self.__obte_pos(pos_original, multiplicador, direccio)
 
-        if self.__caselles[pos_updated[0]][pos_updated[1]].is_accessible():
+        if self.__pos_correcte(pos_updated) and self.__caselles[pos_updated[0]][
+            pos_updated[1]].is_accessible():
             self.__caselles[pos_original[0]][pos_original[1]].pop_agent()
             self.__caselles[pos_updated[0]][pos_updated[1]].put_agent(agent_actual)
-            agent_actual.set_posicio(pos_updated)
+            agent_actual.posicio = pos_updated
             correcte = True
         else:
-            warnings.warn("Acció no possible")
+            msg = f"Acció no possible a la casella {pos_updated}"
+            pos_updated = pos_original
+            warnings.warn(msg)
 
         return correcte, pos_updated
 
     def _aplica(
             self, accio: entorn.Accio, params=None, agent_actual: Viatger = None
     ) -> None:
-        if self.__acabat:
-            return
+        if not self.__acabat:
+            if accio not in Accions:
+                raise ValueError(f"Acció no existent en aquest joc: {accio}")
 
-        if accio not in Accions:
-            raise ValueError(f"Acció no existent en aquest joc: {accio}")
+            if accio is Accions.MOURE or accio is Accions.BOTAR:
+                if params not in ("N", "S", "E", "O"):
+                    raise ValueError(f"Paràmetre {params} incorrecte per acció MOURE")
+                _, pos_updated = self.__moure_agent(params, agent_actual,
+                                                    int(accio is Accions.BOTAR) + 1)
 
-        if accio is Accions.MOURE or accio is Accions.BOTAR:
-            if params not in ("N", "S", "E", "W"):
-                raise ValueError(f"Paràmetre {params} incorrecte per acció MOURE")
-            _, pos_updated = self.__moure_agent(params, agent_actual,
-                                                int(accio is Accions.MOURE) + 1)
+                if self.__caselles[pos_updated[0]][pos_updated[1]].is_desti():
+                    self.__caselles[pos_updated[0]][pos_updated[1]].pop_desti()
+                    self.__acabat = True
+                    print(f"L'agent {agent_actual.nom} ha guanyat")
 
-            if self.__caselles[pos_updated[0]][pos_updated[1]].is_desti():
-                self.__acabat = True
-                print(f"L'agent {agent_actual.nom} ha guanyat")
+            elif accio is Accions.POSAR_PARET:
+                if params not in ("N", "S", "E", "W"):
+                    raise ValueError(f"Paràmetre {params} incorrecte per acció POSAR_PARET")
+                pos_original = agent_actual.posicio
+                pos_updated = self.__obte_pos(pos_original, 1, params)
 
-        elif accio is Accions.POSAR_PARET:
-            if params not in ("N", "S", "E", "W"):
-                raise ValueError(f"Paràmetre {params} incorrecte per acció POSAR_PARET")
-            pos_original = agent_actual.posicio
-            pos_updated = self.__obte_pos(pos_original, 1, params)
-
-            self.__caselles[pos_updated[0]][pos_updated[1]].put_paret()
-            self.__parets.add(pos_updated)
+                if self.__pos_correcte(pos_updated) and self.__caselles[pos_updated[0]][
+                    pos_updated[1]].is_accessible():
+                    self.__caselles[pos_updated[0]][pos_updated[1]].put_paret()
+                    self.__parets.add(pos_updated)
+                else:
+                    msg = f"Acció no possible a la casella {pos_updated}"
+                    warnings.warn(msg)
 
     def _draw(self) -> None:
         super(Laberint, self)._draw()
@@ -265,10 +287,13 @@ class Laberint(joc.Joc):
             for y in range(len(self.__caselles[0])):
                 self.__caselles[x][y].draw(window, x, y)
 
+    def __simplify_caselles(self):
+        return [[c.simplifica() for c in row] for row in self.__caselles]
+
     def percepcio(self) -> dict:
         return {
             "PARETS": self.__parets,
-            "TAULELL": self.__caselles,
+            "TAULELL": self.__simplify_caselles(),
             "DESTI": self.__desti,
             "AGENTS": self.pos_agents
         }
