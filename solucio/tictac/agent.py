@@ -20,7 +20,7 @@ class Agent(joc.Agent):
         self.__cami = None
         self.__visitats = None
 
-    def cerca(self, estat: Estat, torn_max=True, iteracio = 0):
+    def cerca(self, estat: Estat, torn_max=True, iteracio=0):
         if estat.es_meta():
             return estat, (1 if not torn_max else -1)
 
@@ -48,11 +48,9 @@ class Agent(joc.Agent):
     def pinta(self, display):
         pass
 
-    def actua(
-            self, percepcio: entorn.Percepcio
-    ) -> Accio | tuple[Accio, object]:
+    def actua(self, percepcio: entorn.Percepcio) -> Accio | tuple[Accio, object]:
         self.__visitats = set()
-        estat_inicial = Estat(percepcio['taulell'], self.jugador)
+        estat_inicial = Estat(percepcio["taulell"], self.jugador)
 
         res = self.cerca(estat_inicial)
         if isinstance(res, tuple) and len(res[0].accions_previes) > 0:
@@ -60,5 +58,3 @@ class Agent(joc.Agent):
             return Accio.POSAR, solucio.accions_previes[0]
         else:
             return Accio.ESPERAR
-
-
