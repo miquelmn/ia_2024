@@ -285,7 +285,7 @@ class Laberint(joc.Joc):
                     print(f"L'agent {agent_actual.nom} ha guanyat")
 
             elif accio is Accions.POSAR_PARET:
-                if params not in ("N", "S", "E", "W"):
+                if params not in ("N", "S", "E", "O"):
                     raise ValueError(
                         f"Paràmetre {params} incorrecte per acció POSAR_PARET"
                     )
