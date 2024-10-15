@@ -25,7 +25,7 @@ class Accions(enum.Enum):
 
     MOURE -> Pes 1
     BOTAR -> Pes 2
-    BOTAR -> Pes 3
+    POSAR_PARET -> Pes 4
 
     """
     MOURE = 0

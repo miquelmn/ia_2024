@@ -17,6 +17,10 @@ class Viatger(joc.Viatger):
             (Accions.BOTAR, "E"),
             (Accions.BOTAR, "O"),
             (Accions.POSAR_PARET, "S"),
+            (Accions.POSAR_PARET, "N"),
+            (Accions.POSAR_PARET, "E"),
+            (Accions.POSAR_PARET, "O"),
+
         ]
 
     def pinta(self, display):
