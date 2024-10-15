@@ -1,26 +1,26 @@
-"""
+""" Agent Minimax.
 
-ClauPercepcio:
-    POSICIO = 0
-    OLOR = 1
-    PARETS = 2
-"""
+Mòdul en el qual es desenvolupa un agent Minimax amb poda alfa-beta per resoldre el problema del
+Tic Tac Toe.
 
+Creat per: Miquel Miró Nicolau (UIB), 2024
+"""
 from base import entorn
-from practica.joc import Accions
+from tictac import joc
+from tictac.estat_s_o import Estat
 from tictac.joc import Accio
 
-from tictac import joc
-from tictac.estat import Estat
 
 
 class Agent(joc.Agent):
+    PODA = True
+
     def __init__(self, nom):
         super(Agent, self).__init__(nom)
         self.__cami = None
         self.__visitats = None
 
-    def cerca(self, estat: Estat, torn_max=True):
+    def cerca(self, estat: Estat, alpha, beta, torn_max=True):
         if estat.es_meta():
             return estat, (1 if not torn_max else -1)
 
@@ -28,8 +28,19 @@ class Agent(joc.Agent):
 
         for fill in estat.genera_fills():
             if fill not in self.__visitats:
-                punt_fill = self.cerca(fill, not torn_max)
+                punt_fill = self.cerca(fill, alpha, beta, not torn_max)
+
+
                 if isinstance(punt_fill, tuple):
+                    if Agent.PODA:
+                        if torn_max:
+                            alpha = max(alpha, punt_fill[1])
+                        else:
+                            beta = min(beta, punt_fill[1])
+
+                        if alpha > beta:
+                            break
+
                     puntuacio_fills.append(punt_fill)
                 self.__visitats.add(fill)
 
@@ -49,9 +60,10 @@ class Agent(joc.Agent):
         self.__visitats = set()
         estat_inicial = Estat(percepcio["taulell"], self.jugador)
 
-        res = self.cerca(estat_inicial)
-        if isinstance(res, tuple) and len(res[0].accions_previes) > 0:
+        res = self.cerca(estat_inicial, alpha=-float('inf'), beta=float('inf'))
+
+        if isinstance(res, tuple) and res[0].accions_previes is not None and len(res[0].accions_previes) > 0:
             solucio, punt = res
-            return Accio.POSAR, solucio.accions_previes[0]
+            return Accio.POSAR, solucio.accions_previes
         else:
             return Accio.ESPERAR
