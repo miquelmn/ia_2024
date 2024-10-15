@@ -1,12 +1,11 @@
 import copy
-from idlelib.run import fixdoc
 
 
 class Estat:
 
     def __init__(self, taulell, fitxa: str, accions_previes=None):
         self.taulell = taulell
-        self.accions_previes = None
+        self.accions_previes = accions_previes
         self.fitxa = fitxa
 
         self.__es_meta = None
