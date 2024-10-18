@@ -7,6 +7,8 @@ indicades pels agents.
 
 Creat per: Miquel Miró Nicolau (UIB), 2022
 """
+import os
+os.environ['SDL_VIDEO_WINDOW_POS'] = '%d,%d' % (100,100)
 
 import abc
 import sys
@@ -32,10 +34,10 @@ class HasPerdut(Exception):
 
 class Joc:
     def __init__(
-            self,
-            agents: list[agent.Agent],
-            mida_pantalla: tuple[int, int] | None = None,
-            title: str | None = None
+        self,
+        agents: list[agent.Agent],
+        mida_pantalla: tuple[int, int] | None = None,
+        title: str | None = None,
     ):
         self._mida_pantalla = mida_pantalla
         self._agents = agents
