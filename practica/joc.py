@@ -133,7 +133,7 @@ class Casella:
 
     def simplifica(self):
         simple = " "
-        if not (
+        if (
             self.__tipus is TipusCas.PARET
             or self.is_desti()
             or self.__agent is not None
