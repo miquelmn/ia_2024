@@ -1,4 +1,5 @@
 from enum import Enum, IntEnum
+from xml.sax.handler import property_dom_node
 
 import numpy as np
 import pygame
@@ -243,6 +244,14 @@ class Laberint(joc.Joc):
 
     def set_agent(self, agent):
         self._agents = agent
+
+    @property
+    def maze(self):
+        return self.__maze
+
+    @maze.setter
+    def maze(self, maze):
+        self.__maze = maze
 
     def _draw(self):
         super()._draw()
