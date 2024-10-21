@@ -8,7 +8,8 @@ indicades pels agents.
 Creat per: Miquel Miró Nicolau (UIB), 2022
 """
 import os
-os.environ['SDL_VIDEO_WINDOW_POS'] = '%d,%d' % (100,100)
+
+os.environ["SDL_VIDEO_WINDOW_POS"] = "%d,%d" % (100, 100)
 
 import abc
 import sys
@@ -42,6 +43,7 @@ class Joc:
         self._mida_pantalla = mida_pantalla
         self._agents = agents
         self.__title = title
+        self.__game_finished = False
 
         self._game_window = None
 
@@ -55,7 +57,8 @@ class Joc:
                     pygame.quit()
                     sys.exit()
             self._draw()
-            self._logica(self._agents)
+            if not self.__game_finished:
+                self._logica(self._agents)
             pygame.display.flip()
 
     @abc.abstractmethod
@@ -77,6 +80,9 @@ class Joc:
             if not isinstance(accio, tuple):
                 accio = [accio]
             self._aplica(*accio, agent_actual=a)
+
+    def set_game_status(self, finish: bool):
+        self.__game_finished = finish
 
 
 class JocNoGrafic(Joc, ABC):

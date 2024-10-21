@@ -31,19 +31,33 @@ class Laberint(joc.Joc):
     through the maze.
     """
 
-    actions = [Action.MOVE_LEFT, Action.MOVE_RIGHT, Action.MOVE_UP,
-               Action.MOVE_DOWN]  # all possible actions
+    actions = [
+        Action.MOVE_LEFT,
+        Action.MOVE_RIGHT,
+        Action.MOVE_UP,
+        Action.MOVE_DOWN,
+    ]  # all possible actions
 
     reward_exit = 10.0  # reward for reaching the exit cell
-    penalty_move = -0.05  # penalty for a move which did not result in finding the exit cell
+    penalty_move = (
+        -0.05
+    )  # penalty for a move which did not result in finding the exit cell
     penalty_visited = -0.25  # penalty for returning to a cell which was visited earlier
-    penalty_impossible_move = -0.75  # penalty for trying to enter an occupied cell or moving out
+    penalty_impossible_move = (
+        -0.75
+    )  # penalty for trying to enter an occupied cell or moving out
 
     # of the maze
 
-    def __init__(self, agents=None, maze=None, start_cell=(0, 0), exit_cell=(6, 6),
-                 mostra_cami=False):
-        """ Create a new maze game
+    def __init__(
+        self,
+        agents=None,
+        maze=None,
+        start_cell=(0, 0),
+        exit_cell=(6, 6),
+        mostra_cami=False,
+    ):
+        """Create a new maze game
 
         Args:
             agent (QTableModel): Agent to solve the maze (optional).
@@ -55,18 +69,23 @@ class Laberint(joc.Joc):
         """
         super().__init__(agents, (8 * 50, 8 * 50), title="Laberint reforç")
         if maze is None:
-            maze = np.array([
-                [0, 1, 0, 0, 0, 0, 0, 0],
-                [0, 1, 0, 1, 0, 1, 0, 0],
-                [0, 1, 0, 1, 1, 0, 1, 0],
-                [0, 1, 0, 1, 0, 0, 0, 0],
-                [0, 1, 0, 1, 0, 1, 0, 0],
-                [0, 0, 0, 1, 0, 1, 1, 1],
-                [0, 1, 1, 0, 0, 0, 0, 0],
-                [0, 1, 0, 0, 0, 1, 0, 0]])  # 0 = free, 1 = occupied
+            maze = np.array(
+                [
+                    [0, 1, 0, 0, 0, 0, 0, 0],
+                    [0, 1, 0, 1, 0, 1, 0, 0],
+                    [0, 1, 0, 1, 1, 0, 1, 0],
+                    [0, 1, 0, 1, 0, 0, 0, 0],
+                    [0, 1, 0, 1, 0, 1, 0, 0],
+                    [0, 0, 0, 1, 0, 1, 1, 1],
+                    [0, 1, 1, 0, 0, 0, 0, 0],
+                    [0, 1, 0, 0, 0, 1, 0, 0],
+                ]
+            )  # 0 = free, 1 = occupied
 
         self.__maze = maze
-        self.__minimum_reward = -0.5 * self.__maze.size  # stop game if accumulated reward
+        self.__minimum_reward = (
+            -0.5 * self.__maze.size
+        )  # stop game if accumulated reward
         # is below this threshold
 
         nrows, ncols = self.__maze.shape
@@ -76,9 +95,10 @@ class Laberint(joc.Joc):
         self.__start_cell = self.__previous_cell = self.__current_cell = start_cell
         self.__total_reward = 0.0  # accumulated reward
         self.__visited = set()  # a set() only stores unique values
+        self.__mostra_cami = mostra_cami
 
     def _aplica(self, accio: entorn.Accio, params=None, agent_actual=None):
-        """ Move the agent according to 'action' and return the new state, reward and game status.
+        """Move the agent according to 'action' and return the new state, reward and game status.
 
         Args:
             accio: the agent will move in this direction
@@ -98,7 +118,7 @@ class Laberint(joc.Joc):
         if status is not Status.PLAYING:
             self.set_game_status(True)
 
-        return state['POS'], reward, status
+        return state["POS"], reward, status
 
     def reset(self, start_cell=(0, 0)):
         self.__previous_cell = self.__current_cell = start_cell
@@ -109,7 +129,7 @@ class Laberint(joc.Joc):
         return start_cell
 
     def __execute(self, action):
-        """ Execute action and collect the reward or penalty.
+        """Execute action and collect the reward or penalty.
 
         Args:
             action: direction in which the agent will move
@@ -120,7 +140,9 @@ class Laberint(joc.Joc):
         possible_actions = self.__possible_actions(self.__current_cell)
 
         if not possible_actions:
-            reward = self.__minimum_reward - 1  # cannot move anywhere, force end of game
+            reward = (
+                self.__minimum_reward - 1
+            )  # cannot move anywhere, force end of game
 
         elif action in possible_actions:
             col, row = self.__current_cell
@@ -140,7 +162,9 @@ class Laberint(joc.Joc):
 
             self.__visited.add(self.__current_cell)
         else:
-            reward = Laberint.penalty_impossible_move  # penalty for trying to enter an occupied
+            reward = (
+                Laberint.penalty_impossible_move
+            )  # penalty for trying to enter an occupied
             # cell or move out of the maze
 
         return reward
@@ -149,15 +173,19 @@ class Laberint(joc.Joc):
         if self.__current_cell == self.__exit_cell:
             reward = Laberint.reward_exit  # maximum reward when reaching the exit cell
         elif self.__current_cell in self.__visited:
-            reward = Laberint.penalty_visited  # penalty when returning to a cell which was
+            reward = (
+                Laberint.penalty_visited
+            )  # penalty when returning to a cell which was
             # visited earlier
         else:
-            reward = Laberint.penalty_move  # penalty for a move which did not result in finding
+            reward = (
+                Laberint.penalty_move
+            )  # penalty for a move which did not result in finding
             # the exit cell
         return reward
 
     def __possible_actions(self, cell: tuple[int, int]):
-        """ Create a list with all possible actions from 'cell', avoiding the maze's edges and
+        """Create a list with all possible actions from 'cell', avoiding the maze's edges and
         walls.
 
         Args:
@@ -175,32 +203,36 @@ class Laberint(joc.Joc):
         if row == 0 or (row > 0 and self.__maze[row - 1, col] == Cell.OCCUPIED):
             possible_actions.remove(Action.MOVE_UP)
         if row == nrows - 1 or (
-                row < nrows - 1 and self.__maze[row + 1, col] == Cell.OCCUPIED):
+            row < nrows - 1 and self.__maze[row + 1, col] == Cell.OCCUPIED
+        ):
             possible_actions.remove(Action.MOVE_DOWN)
 
         if col == 0 or (col > 0 and self.__maze[row, col - 1] == Cell.OCCUPIED):
             possible_actions.remove(Action.MOVE_LEFT)
         if col == ncols - 1 or (
-                col < ncols - 1 and self.__maze[row, col + 1] == Cell.OCCUPIED):
+            col < ncols - 1 and self.__maze[row, col + 1] == Cell.OCCUPIED
+        ):
             possible_actions.remove(Action.MOVE_RIGHT)
 
         return possible_actions
 
     def __status(self):
-        """ Return the game status.
+        """Return the game status.
 
-            :return Status: current game status (WIN, LOSE, PLAYING)
+        :return Status: current game status (WIN, LOSE, PLAYING)
         """
         if self.__current_cell == self.__exit_cell:
             return Status.WIN
 
-        if self.__total_reward < self.__minimum_reward:  # force end of game after too much loss
+        if (
+            self.__total_reward < self.__minimum_reward
+        ):  # force end of game after too much loss
             return Status.LOSE
 
         return Status.PLAYING
 
     def percepcio(self):
-        """ Return the state of the maze: the agent current location
+        """Return the state of the maze: the agent current location
 
         Returns:
             {'POS': numpy.array [1][2]: agents current location}
@@ -222,7 +254,7 @@ class Laberint(joc.Joc):
                 self.draw_casella(y, x, self.__maze[x][y] == 1)
 
     def draw_casella(self, x, y, buida=True):
-        if (x, y) in self.__visited:
+        if (x, y) in self.__visited and self.__mostra_cami:
             pygame.draw.rect(
                 self._game_window,
                 pygame.Color(255, 235, 245),
@@ -236,7 +268,6 @@ class Laberint(joc.Joc):
                 pygame.Rect(x * 50, y * 50, 50, 50),
                 0 if buida else 1,
             )
-
 
         if self.__current_cell[0] == x and self.__current_cell[1] == y:
             img = pygame.image.load("../assets/prova.png")
