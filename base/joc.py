@@ -39,32 +39,43 @@ class Joc:
         agents: list[agent.Agent],
         mida_pantalla: tuple[int, int] | None = None,
         title: str | None = None,
+        target_FPS: int = 60
     ):
         self._mida_pantalla = mida_pantalla
         self._agents = agents
         self.__title = title
         self.__game_finished = False
 
+        #allow for smoothness (window dragging)
+        self.FPS = target_FPS
+
         self._game_window = None
 
     def comencar(self) -> None:
         pygame.init()
 
+        #prevent screen flickering
+        self._game_window = pygame.display.set_mode(self._mida_pantalla)
+
+        ticks:int = 0
+
         while True:
-            fps_controller.tick(1)
+            fps_controller.tick(self.FPS)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
             self._draw()
-            if not self.__game_finished:
+            if not self.__game_finished and ticks == 0:
                 self._logica(self._agents)
+            ticks = (ticks+1)%self.FPS
+            
             pygame.display.flip()
 
     @abc.abstractmethod
     def _draw(self):
         pygame.display.set_caption(self.__title)
-        self._game_window = pygame.display.set_mode(self._mida_pantalla)
+        
 
     @abc.abstractmethod
     def percepcio(self) -> entorn.Percepcio:
