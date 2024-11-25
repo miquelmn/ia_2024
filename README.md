@@ -38,3 +38,4 @@ Instal·lar les llibreries.
 6. **Models lineals (I): Introducció ML i Perceptró**. Primera pràctica amb aprenentatge automàtic, emprant el perceptró.
 7. **Models lineals (II): Regressió i correlació**: Explicam el problema de regressió i introduïm la correlació.
 8. **Models lineals (III): Regressió logística i K-fold**: Introduïm la regressió logística i el K-Fold.
+9. **SVM (I)**. SVM lineal i ara podem triar els millors hiperparàmetres.
